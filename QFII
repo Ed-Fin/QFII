@@ -1,0 +1,31 @@
+# Import
+import requests 
+import json
+import pandas as pd
+
+# Open All Data
+pd.options.display.max_columns = None
+pd.options.display.max_rows = None
+
+# DataFrame
+SZSE = pd.DataFrame(None, columns = ['Date', 'A-share Ticker', 'A-share Name', 'QFII/RQII Shares(100 millions)', 'Ratio(%)'])
+
+# SZSE QFII/RQII APIs
+url1 = "http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1264&TABKEY=tab1&PAGENO=1&random=0.16855260902743874"
+url2 = "http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1264&TABKEY=tab1&PAGENO=2&random=0.16855260902743874"
+url3 = "http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1264&TABKEY=tab1&PAGENO=3&random=0.16855260902743874"
+url4 = "http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1264&TABKEY=tab1&PAGENO=4&random=0.16855260902743874"
+url5 = "http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1264&TABKEY=tab1&PAGENO=5&random=0.16855260902743874"
+url_list = [url1, url2, url3, url4, url5]
+
+# Hide the crawler to normal viewr
+headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36' } 
+
+# Crawling
+for url in url_list:
+    response = requests.get(url = url, headers = headers, verify = False) 
+    content = json.loads(response.content.decode())
+    for row in content[0]['data']:
+        temp_df = pd.DataFrame([[row['jyrq'], row['zqdh'], row['zqjc'], row['ygsl'], row['cgbl']]], columns = ['Date', 'A-share Ticker', 'A-share Name', 'QFII/RQII Shares(100 millions)', 'Ratio(%)'])
+        SZSE = SZSE.append(temp_df)
+SZSE
